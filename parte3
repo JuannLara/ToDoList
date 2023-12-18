@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px;
+    }
+
+    #task-input, #filter-input {
+      margin-bottom: 10px;
+      padding: 8px;
+      width: 300px;
+      box-sizing: border-box;
+    }
+
+    .task {
+      margin-bottom: 8px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 300px;
+    }
+
+    .task input[type="checkbox"] {
+      margin-right: 8px;
+    }
+
+    .task.completed {
+      text-decoration: line-through;
+      color: #777;
+    }
+
+    .delete-btn {
+      background-color: #ff4d4d;
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #add-btn, #delete-completed-btn {
+      background-color:cornflowerblue;
+      color: #fff;
+      border: none;
+      padding: 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 10px;
+    }
+  </style>
+  <title>Lista de Tareas</title>
+</head>
+<body>
+
+  <h1>Lista de Tareas</h1>
+
+  <input type="text" id="task-input" placeholder="Nueva tarea...">
+  <button id="add-btn">Agregar Tarea</button>
+  <input type="text" id="filter-input" placeholder="Filtrar tarea...">
+  <button id="delete-completed-btn">Eliminar Completadas</button>
+
+  <div id="task-list"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const taskInput = document.getElementById('task-input');
+      const addBtn = document.getElementById('add-btn');
+      const filterInput = document.getElementById('filter-input');
+      const deleteCompletedBtn = document.getElementById('delete-completed-btn');
+      const taskList = document.getElementById('task-list');
+
+      addBtn.addEventListener('click', addTask);
+      taskInput.addEventListener('keyup', function (event) {
+        if (event.key === 'Enter') {
+          addTask();
+        }
+      });
+
+      filterInput.addEventListener('input', filterTasks);
+
+      deleteCompletedBtn.addEventListener('click', deleteCompletedTasks);
+
+      function addTask() {
+        if (taskInput.value.trim() !== '') {
+          const taskText = taskInput.value.trim();
+          const taskItem = document.createElement('div');
+          taskItem.classList.add('task');
+          taskItem.innerHTML = `
+            <input type="checkbox">
+            <span>${taskText}</span>
+            <button class="delete-btn" onclick="deleteTask(this.parentNode)">Eliminar</button>
+          `;
+          taskList.appendChild(taskItem);
+          taskInput.value = '';
+          filterTasks();
+        }
+      }
+
+      function filterTasks() {
+        const filterText = filterInput.value.toLowerCase();
+        const tasks = document.querySelectorAll('.task');
+
+        tasks.forEach(task => {
+          const taskText = task.querySelector('span').innerText.toLowerCase();
+          const isVisible = taskText.includes(filterText);
+          task.style.display = isVisible ? 'flex' : 'none';
+        });
+      }
+
+      function deleteTask(taskItem) {
+        taskItem.remove();
+      }
+
+      function deleteCompletedTasks() {
+        const completedTasks = document.querySelectorAll('.task.completed');
+        completedTasks.forEach(taskItem => taskItem.remove());
+      }
+
+      taskList.addEventListener('change', function (event) {
+        const checkbox = event.target;
+        const taskItem = checkbox.closest('.task');
+
+        if (taskItem) {
+          taskItem.classList.toggle('completed', checkbox.checked);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
